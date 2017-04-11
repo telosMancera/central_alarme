@@ -1,46 +1,77 @@
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include "alarm_enable.h"
 #include "buzzer.h"
+#include "lcd.h"
 #include "sensors.h"
 #include "utils.h"
 
-uint16_t triggered_sensors = 0;
-char msg_line0[16];
-char msg_line1[16];
+#define ENABLING_ALARM_BUZZER_PULSE_TIME  2000 // 2s
 
-/* Inicializa o display no endereco 0x27 */
-LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7,3, POSITIVE);
+uint16_t triggered_sensors = 0;
+bool alarm_enabled = false;
+char msg_line0[LCD_NUMBER_OF_COLUMNS];
+char msg_line1[LCD_NUMBER_OF_COLUMNS];
 
 /* Inicializacao */
 void setup ()
 {
-  int i;
-  
-  buzzer_init();
+  alarm_enable_init();
   sensors_init();
+  buzzer_init();
 
-  lcd.begin (16,2);
-  lcd.setBacklight(HIGH);
-  myxmemzero((int *)lcd_msg, sizeof(lcd_msg) / sizeof(int));
+  lcd_init();
+  myxmemzero((int *)msg_line0, sizeof(msg_line0) / sizeof(int));
+  myxmemzero((int *)msg_line1, sizeof(msg_line1) / sizeof(int));
 }
 
 /* Loop principal */
 void loop ()
 {
-  /* Leitura dos sensores */
-  triggered_sensors = sensors_read();
-  
-  /* Controle do buzzer */
-  if (triggered_sensors) buzzer_enable();
-  else buzzer_disable();
-  
-  /* Controle da mensagem para o LCD */
-  if (triggered_sensors) mystrcpy(lcd_msg, "     BRUTUS     ALARME ATIVADO ");
-  else mystrcpy(lcd_msg, "     BRUTUS      ALARM  SYSTEM ");
+  /* Leitura do enable do alarm */
+  if (does_alarm_must_be_enabled())
+  {
+    if (!alarm_enabled)
+    {
+      mystrcpy(msg_line0, "     ATIVANDO   ");
+      mystrcpy(msg_line1, "     ALARME     ");
+      lcd_print(msg_line0, msg_line1);
+      
+      buzzer_pulse(ENABLING_ALARM_BUZZER_PULSE_TIME);
+    }
+    
+    alarm_enabled = true;
+  }
+  else alarm_enabled = false;
+
+  /* Maquina de estados de dois estados (alarme habilitado e desabilitado) */
+  if (alarm_enabled)
+  {
+    /* Leitura dos sensores */
+    triggered_sensors = sensors_read();
+
+    /* 1 ou mais sensores gatilhados */
+    if (triggered_sensors)
+    {
+      buzzer_enable();
+
+      mystrcpy(msg_line0, "      ALARM     ");
+      mystrcpy(msg_line1, "    TRIGGERED   ");
+    }
+    else
+    {
+      buzzer_disable();
+
+      mystrcpy(msg_line0, "     ALARME     ");
+      mystrcpy(msg_line1, "     ATIVADO    ");
+    }
+  }
+  else
+  {
+    buzzer_disable();
+
+    mystrcpy(msg_line0, "     BRUTUS     ");
+    mystrcpy(msg_line1, "  ALARM SYSTEM  ");
+  }
   
   /* Impressao da mensagem no LCD */
-  lcd.setCursor(0,0);
-  lcd.print("     BRUTUS     ");
-  lcd.setCursor(0,1);
-  lcd.print(" alarme ativado ");
+  lcd_print(msg_line0, msg_line1);
 }

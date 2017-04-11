@@ -12,7 +12,6 @@ void sensors_init (void)
 	pinMode(SENSOR_CHANNEL_6, INPUT);
 	pinMode(SENSOR_CHANNEL_7, INPUT);
 	pinMode(SENSOR_CHANNEL_8, INPUT);
-	pinMode(SENSOR_CHANNEL_9, INPUT);
 }
 
 /* Leitura dos sensores */
@@ -21,7 +20,7 @@ uint16_t sensors_read (void)
 	int i;
 	uint16_t triggered_sensors = 0;
 
-	for (i = SENSOR_CHANNEL_1; i <= SENSOR_CHANNEL_9; i++)
+	for (i = SENSOR_CHANNEL_1; i <= SENSOR_CHANNEL_8; i++)
 	{
 		int sensor_bit;
 
