@@ -7,7 +7,7 @@ extern "C"
 #endif
 
 #define ALARM_ENABLE  13
-#define ALARM_ENABLED  false
+#define ALARM_ENABLED  true
 #define ALARM_DISABLED  (!ALARM_ENABLED)
 
 void alarm_enable_init (void);

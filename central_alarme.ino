@@ -11,6 +11,20 @@ bool alarm_enabled = false;
 char msg_line0[LCD_NUMBER_OF_COLUMNS];
 char msg_line1[LCD_NUMBER_OF_COLUMNS];
 
+/* Calculo de quantos sensores estao ativados */
+int triggered_quantity (void)
+{
+  int i = 0;
+  int qty = 0;
+
+  for (i = 0; i < NUMBER_OF_SENSORS; i++)
+  {
+    if (triggered_sensors & (1 << i)) qty++;
+  }
+
+  return qty;
+}
+
 /* Inicializacao */
 void setup ()
 {
@@ -53,15 +67,18 @@ void loop ()
     {
       buzzer_enable();
 
-      mystrcpy(msg_line0, "      ALARM     ");
-      mystrcpy(msg_line1, "    TRIGGERED   ");
+      /*mystrcpy(msg_line0, "      ALARM     ");
+      mystrcpy(msg_line1, "    TRIGGERED   ");*/
+      mystrcpy(msg_line0, "    TRIGGERED   ");
+      mystrcpy(msg_line1, "                ");
+      itoa(triggered_quantity(), msg_line1 + 8, 10);
     }
     else
     {
       buzzer_disable();
 
-      mystrcpy(msg_line0, "     ALARME     ");
-      mystrcpy(msg_line1, "     ATIVADO    ");
+      mystrcpy(msg_line0, "     SYSTEM     ");
+      mystrcpy(msg_line1, "    ACTIVATED   ");
     }
   }
   else

@@ -20,8 +20,11 @@ enum sensors_enum
   //SENSOR_CHANNEL_9 // 4N25 da ultima linha e ultima coluna. Utilizado por enqto como enable do alarm
 };
 
+/* Numero de sensores */
+#define NUMBER_OF_SENSORS  8
+
 /* Estado dos sensores */
-#define SENSOR_TRIGGERED  false
+#define SENSOR_TRIGGERED  true
 #define SENSOR_NOT_TRIGGERED  (!SENSOR_TRIGGERED)
 
 void sensors_init (void);
