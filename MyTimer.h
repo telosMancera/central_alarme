@@ -1,10 +1,10 @@
 #ifndef MYTIMER_H_
-#define MYTIMER_H-
+#define MYTIMER_H_
 
 class MyTimer
 {
 	public :
-    MyTimer (void);
+		MyTimer (void);
 		int start (void);
 		int stop (void);
 		int restart (void);
